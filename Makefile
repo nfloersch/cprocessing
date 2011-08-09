@@ -14,7 +14,7 @@ $(OBJDIR)/libcprocessing.a: $(OBJECTS)
 clean:
 	rm -rf $(OBJECTS) $(OBJDIR)/libcprocessing.a
 
-$(OBJDIR)/%.o: %.cpp cprocessing.h
+$(OBJDIR)/%.o: %.cpp cprocessing.hpp
 	@echo compiling $<
 	@gcc $(CFLAGS) -c $< -o $@
 	

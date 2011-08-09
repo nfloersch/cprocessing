@@ -46,6 +46,10 @@ namespace cprocessing {
 		unsigned char rgba[4];
 		/// Constructor
 		color (double r, double g, double b, double a = 255);
+		/// Fills a float array with color values scaled for the interval 0..1
+		void toFloat(float a[]);
+		/// Fills a double array with color values scaled for the interval 0..1
+		void toDouble(double a[]);
 	};
 
 	/// Represents a vector (or, sometimes, a point) in 3D
@@ -150,8 +154,9 @@ namespace cprocessing {
 	extern color strokeColor;  ///< Line drawing color
 	extern color fillColor;   ///< Area drawing color
 
+	//========================================================================
 	//
-	// Drawing Attributes
+	// Drawing Attributes (file attributes.cpp)
 	//
 
 	/// Sets line color
@@ -203,8 +208,9 @@ namespace cprocessing {
 
 	void noSmooth(); ///< Turns off smoothing
 
+	//========================================================================
 	//
-	// Drawing Primitives
+	// Drawing Primitives (file primitives.cpp)
 	//
 
 	/// Draws a 3D line segment given the coordinates
@@ -279,9 +285,9 @@ namespace cprocessing {
 	/// @param z The z coordinate of the point
 	void point (double x, double y, double z = 0);
 
-
+	//========================================================================
 	//
-	// Shapes and vertices
+	// Shapes and vertices (file shapes.cpp)
 	//
 
 	// Starts the definition of a shape
@@ -321,9 +327,19 @@ namespace cprocessing {
 		bezierVertex (cx1, cy1, 0, cx2, cy2, 0, x, y, 0);
 	}
 
+	/// Draws a cubic Bézier curve for the 4 control points
+	void bezier(double x1,double y1,double z1,double cx1,double cy1,double cz1,
+				double cx2,double cy2,double cz2,double x2,double y2,double z2);
 
+	/// 2D version of bezier
+	inline void bezier(double x1, double y1, double cx1, double cy1,
+				double cx2, double cy2, double x2, double y2) {
+		bezier (x1, y1, 0, cx1, cy1, 0, cx2, cy2, 0, x2, y2, 0);
+	}
+
+	//===========================================================================
 	//
-	// Transformations
+	// Transformations (file transformations.cpp)
 	//
 
     /// Applies a translation transformation
@@ -407,8 +423,56 @@ namespace cprocessing {
 	}
 
 
+	//===========================================================================
+	//
+	// lights (file lights.cpp)
+	//
+
+    /// Defines a new directional light.
+    /// @arg v1, v2, v3: color components.
+    /// @arg nx, ny, nz: direction vector.
+    void directionalLight(double v1, double v2, double v3,
+                          double nx, double ny, double nz);
+
+    /// Defines a new directional light.
+    /// @arg v1, v2, v3: color components.
+    /// @arg x, y, z: position coordinates.
+    void pointLight(double  v1,double  v2,double  v3,double  x,double  y,double  z);
+
+    /// Defines a new ambient light.
+    /// @arg v1, v2, v3: color components.
+    /// @arg x, y, z: position coordinates.
+    void ambientLight(double  v1,double  v2,double  v3, double  x=0, double  y=0, double  z=0);
+
+    /// Defines a new spot light.
+    /// @arg v1, v2, v3: color components.
+    /// @arg x, y, z: position coordinates.
+    /// @arg nx, ny, nz: direction vector.
+    /// @arg angle: angle in radians of spot aperture.
+    /// @arg concentration: exponent which determines preference for spot axis.
+    void spotLight(double v1, double  v2, double  v3,
+                   double  x, double  y, double  z,
+                   double  nx, double ny,double  nz,
+                   double  angle, double  concentration);
+
+    /// Defines a specular coefficients of new light sources.
+    /// @arg v1, v2, v3: color components.
+    void lightSpecular (double v1,double  v2,double  v3);
+
+    /// Defines light attenuation factors
+    /// @args constant, linear, quadratic: coefficients of quadratic polynomial.
+    void lightFalloff(double  constant,double  linear,double  quadratic);
+
+    /// Turns on the default lighting
+    void lights();
+
+    // Turns off the lights
+    void noLights();
+
+
+
     //
-	// Initialization
+	// Initialization (file cprocessing.cpp)
 	//
 
     /// Sets up a window of the given size
