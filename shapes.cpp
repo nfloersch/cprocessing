@@ -75,7 +75,9 @@ struct PPath {
 	}
 };
 
-
+///
+/// Some local module variables
+///
 static PPath shape; ///< Data for current shape
 static ShapeMode mode; ///< Current shape type
 
@@ -85,14 +87,14 @@ static std::vector<BlendFactor> bezierBlend; ///< bezierDetail samples of Bézie
 
 namespace cprocessing {
 
-	// Starts the definition of a shape
+	/// Starts the definition of a shape
 	void beginShape(ShapeMode mode) {
 		PPath newshape;
 		shape = newshape;
 		::mode = mode;
 	}
 
-	// Finishes and renders the shape
+	/// Finishes and renders the shape
 	void endShape(ShapeClose close) {
 
 		/// First handle the filled shape
@@ -198,7 +200,7 @@ namespace cprocessing {
 	    double t;
 	    double u;
 	    for (int i=0; i < n+1; i++) {
-	    	t = float(i)/n;
+	    	t = double(i)/n;
 	    	u = 1 - t;
 	    	BlendFactor blend;
 	    	blend.push_back (u*u*u);
@@ -252,5 +254,14 @@ namespace cprocessing {
 	    	PVector p = a*factor[0] + b*factor[1] + c*factor[2] + d*factor[3];
 	    	shape.addVertex (p);
 	    }
+	}
+
+	/// Draws a cubic Bézier curve for the 4 control points
+	void bezier(double x1, double y1, double z1, double cx1, double cy1, double cz1,
+				double cx2, double cy2, double cz2, double x2, double y2, double z2) {
+		beginShape();
+		vertex (x1, y1, z1);
+		bezierVertex(cx1, cy1, cz1, cx2, cy2, cz2, x2, y2, z2);
+		endShape();
 	}
 }
