@@ -8,7 +8,14 @@
  */
 
 #include <GL/glut.h>
+#include <vector>
+#include <cassert>
 #include "cprocessing.hpp"
+
+using namespace cprocessing;
+
+static unsigned ellipseMode = CENTER; ///< Ellipse drawing mode
+static std::vector<PVector> ellipseVtx;  ///< Vertices of circle centered at the origin and diameter 1
 
 namespace cprocessing {
 
@@ -99,11 +106,82 @@ namespace cprocessing {
 	void point (double x, double y, double z)
 	{
 		if (strokeColor.rgba[3] > 0) {
+			// Draw point using the stroke color
 			glColor4ubv (strokeColor.rgba);
 			glBegin (GL_POINTS);
 			glVertex3d (x,y,z);
 			glEnd();
 		}
 	}
-
+	
+		
+	/// Configures the number of line segments used for drawing an ellipse
+	/// @arg n: number of sides
+	void ellipseDetail (unsigned n) {
+		ellipseVtx.clear();
+		for (unsigned i = 0; i < n; i++) {
+			double ang = M_PI * 2 * i / n;
+			double x = cos(ang)/2;
+			double y = sin(ang)/2;
+			ellipseVtx.push_back (PVector (x, y, 0)); 
+		}
+	}
+	
+	/// Configures the way the 'ellipse' function interprets its arguments
+	/// @arg mode: either CENTER, RADIUS, CORNER or CORNERS
+	void ellipseMode (unsigned mode) {
+		assert (mode == CENTER || mode == RADIUS || mode == CORNER || mode == CORNERS);
+		::ellipseMode = mode;
+	}
+	
+	
+	/// Draws an ellipse. The meaning of the arguments depend on the current
+	/// ellipseMode. By default:
+	/// @arg x, y: center of the ellipse
+	/// @arg width, height: size of the ellipse axes
+	void ellipse (double x, double y, double width, double height) 
+	{
+		// Make changes to arguments to reflect the current ellipseMode
+		switch (::ellipseMode) {
+		case CENTER:
+			x -= width/2;
+        	y -= height/2;
+        	break;
+        case RADIUS:
+		    x -= width;
+		    y -= height;
+		    width *= 2;
+		    height *= 2;
+		    break;
+		case CORNERS:
+		    width = width-x;
+		    height = height-y;
+		    break;
+		}
+		
+		// Draw ellipse 
+		glMatrixMode(GL_MODELVIEW);
+	    glPushMatrix();
+    	glTranslatef(x,y,0);
+	    glScalef(width,height,1);
+	    glTranslatef(0.5,0.5,0);
+	    // activate and specify pointer to vertex array
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glVertexPointer(3, GL_DOUBLE, 0, ellipseVtx [0].array());
+    	if (fillColor.rgba[3] > 0) {
+			// See if filled ellipse is required
+			glColor4ubv (fillColor.rgba);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			glDrawArrays(GL_POLYGON,0,ellipseVtx.size());
+    	}
+    	if (strokeColor.rgba[3] > 0) {
+			// See if filled ellipse is required
+			glColor4ubv (strokeColor.rgba);
+			glDrawArrays(GL_LINE_LOOP,0,ellipseVtx.size());
+    	}
+    	// deactivate vertex arrays after drawing
+		glDisableClientState(GL_VERTEX_ARRAY);
+		// Restore modelview
+    	glPopMatrix();
+    }
 }

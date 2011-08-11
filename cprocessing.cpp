@@ -230,6 +230,7 @@ namespace cprocessing {
 		glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     	glutTimerFunc (1000/frameRate, refresh, 0);
     	bezierDetail(50);
+    	ellipseDetail(50);
     	::setup();
         glutMainLoop();
     }
