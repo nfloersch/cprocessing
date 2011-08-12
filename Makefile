@@ -17,4 +17,6 @@ clean:
 $(OBJDIR)/%.o: %.cpp cprocessing.hpp
 	@echo compiling $<
 	@gcc $(CFLAGS) -c $< -o $@
-	
+
+examples:
+	$(MAKE) -C examples all

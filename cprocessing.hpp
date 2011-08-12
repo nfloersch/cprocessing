@@ -1,5 +1,5 @@
 /*
- * graphics.hpp
+ * cprocessing.hpp
  *
  *  Created on: Apr 28, 2011
  *      Author: esperanc
@@ -22,7 +22,8 @@ namespace cprocessing {
 
 	/// Other constants
 	enum { F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12,
-		   UP, DOWN, LEFT, RIGHT, CENTER, PAGEUP, PAGEDOWN, HOME, END, INSERT
+		   UP, DOWN, LEFT, RIGHT, CENTER, PAGEUP, PAGEDOWN, HOME, END, INSERT,
+		   RADIUS, CORNER, CORNERS 
 	};
 
 	/// Configuration flags
@@ -135,8 +136,9 @@ namespace cprocessing {
 	};
 
 
+	//============================================================================
 	//
-	// Global variables
+	// Global variables (defined in file cprocessing.cpp)
 	//
 	extern int mouseX;  ///< Mouse x coordinate
 	extern int mouseY;  ///< Mouse y coordinate
@@ -154,7 +156,7 @@ namespace cprocessing {
 	extern color strokeColor;  ///< Line drawing color
 	extern color fillColor;   ///< Area drawing color
 
-	//========================================================================
+	//============================================================================
 	//
 	// Drawing Attributes (file attributes.cpp)
 	//
@@ -284,7 +286,22 @@ namespace cprocessing {
 	/// @param y The y coordinate of the point
 	/// @param z The z coordinate of the point
 	void point (double x, double y, double z = 0);
-
+	
+	
+	/// Configures the number of line segments used for drawing an ellipse
+	/// @arg n: number of sides
+	void ellipseDetail (unsigned n);
+	
+	/// Configures the way the 'ellipse' function interprets its arguments
+	/// @arg mode: either CENTER, RADIUS, CORNER or CORNERS
+	void ellipseMode (unsigned mode);
+	
+	/// Draws an ellipse. The meaning of the arguments depend on the current
+	/// ellipseMode. By default:
+	/// @arg x, y: center of the ellipse
+	/// @arg width, height: size of the ellipse axes
+	void ellipse (double x, double y, double width, double height);
+	
 	//========================================================================
 	//
 	// Shapes and vertices (file shapes.cpp)
@@ -468,7 +485,6 @@ namespace cprocessing {
 
     // Turns off the lights
     void noLights();
-
 
 
     //
