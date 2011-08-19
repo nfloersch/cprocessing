@@ -20,11 +20,11 @@ void keyPressed() {
 	endShape();
 }
 
+
 void setup() {
 	size (300,300);
 	smooth();
 	strokeWeight(1);
-
 }
 
 

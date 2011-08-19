@@ -77,6 +77,7 @@ namespace cprocessing {
 
         // Default background is gray 70%
         background (200);
+        std::cout << "Cleaning Background\n";
         glutSwapBuffers();
     }
 
