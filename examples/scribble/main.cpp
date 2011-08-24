@@ -20,11 +20,14 @@ void keyPressed() {
 	endShape();
 }
 
+void draw() {
+}
 
 void setup() {
 	size (300,300);
 	smooth();
 	strokeWeight(1);
+	//config &= ~BACK_BUFFER;
 }
 
 

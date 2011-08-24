@@ -28,8 +28,10 @@ namespace cprocessing {
 
 	/// Configuration flags
 	enum {
-		HALF_PIXEL_SHIFT = 1,    // Whether to shift vertex coordinates by half a pixel (true by default)
-		Y_DOWN           = 1<<1  // Whether to flip the y axis so it points down, rather than up (true by default)
+		HALF_PIXEL_SHIFT = 1,    // Whether to shift vertex coordinates by half a pixel (true by default).
+		Y_DOWN           = 1<<1, // Whether to flip the y axis so it points down, rather than up (true by default).
+		BACK_BUFFER		 = 1<<2  // Whether to use a backup buffer which is copied every frame in order to effect a stable drawing
+		                         // canvas which is maintained between frames (true by default, but should be disabled for speed).
 	};
 
 	/// Shape constants

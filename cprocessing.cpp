@@ -7,6 +7,7 @@
 
 #include <GL/glut.h>
 #include <iostream>
+#include <cassert>
 #include "cprocessing.hpp"
 
 /// This will link with the client's functions
@@ -19,6 +20,32 @@ extern void mouseDragged();
 extern void keyPressed();
 extern void keyReleased();
 
+using namespace cprocessing;
+
+/// Variables and functions to maintain a backup buffer
+char * backbuffer = 0;
+
+static void allocbuffer() {
+	if (backbuffer != 0) delete backbuffer;
+	backbuffer = new char [width*height*4]; 
+}
+
+static void readbuffer() {
+	if (backbuffer) {
+		glFlush();
+		glReadPixels (0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE , (void*) backbuffer);
+	}
+}
+
+static void writebuffer() {
+	if (backbuffer) {
+		glPushMatrix();
+		glLoadIdentity();
+		glRasterPos3f(0,0,0);
+		glDrawPixels (width, height, GL_RGBA, GL_UNSIGNED_BYTE , (void*) backbuffer);
+		glPopMatrix();
+	}
+}
 
 namespace cprocessing {
 
@@ -39,7 +66,7 @@ namespace cprocessing {
 	int width;     ///< window width
 	int height;    ///< window height
 
-	unsigned config = HALF_PIXEL_SHIFT | Y_DOWN; ///< Configuration flags
+	unsigned config = HALF_PIXEL_SHIFT | Y_DOWN | BACK_BUFFER; ///< Configuration flags
 
 	int frameRate = 60; ///< Frames per second
 
@@ -51,12 +78,18 @@ namespace cprocessing {
     /// This is called for each frame
     static void display () {
 
+		// Restore backing buffer if needed
+		if (config&BACK_BUFFER) writebuffer();
+        
         // Default transformation
         camera();
         perspective();
 
         // Call external display function
         ::draw();
+
+		// Refresh backing buffer if needed
+		if (config&BACK_BUFFER) readbuffer();
 
         // End by swapping front and back buffers
         glutSwapBuffers() ;
@@ -77,8 +110,15 @@ namespace cprocessing {
 
         // Default background is gray 70%
         background (200);
-        std::cout << "Cleaning Background\n";
         glutSwapBuffers();
+        background (200);
+        
+        // Reset backup buffer if needed
+        if (config&BACK_BUFFER) {
+        	allocbuffer();
+        	readbuffer();
+        }
+       
     }
 
     /// The refresh function is called periodically to redisplay
@@ -102,6 +142,7 @@ namespace cprocessing {
 
     /// Called whenever mouse button is pressed
     static void mouse (int button, int state, int x, int y) {
+
     	pmouseX = mouseX;
     	pmouseY = mouseY;
     	mouseX = x;
@@ -121,7 +162,6 @@ namespace cprocessing {
       	else {
       		::mouseReleased();
       	}
-
     }
 
     /// Called whenever a key is pressed
@@ -189,10 +229,17 @@ namespace cprocessing {
     	::keyPressed();
     }
 
+
     /// Called whenever a special key is released
     static void specialup (int ch, int x, int y) {
+		// Restore backing buffer if needed
+		if (config&BACK_BUFFER) writebuffer();
+
     	keyPressed = false;
     	::keyReleased();
+
+		// Refresh backing buffer if needed
+		if (config&BACK_BUFFER) readbuffer();
     }
 
     /// Sets up a window of the given size
@@ -217,7 +264,6 @@ namespace cprocessing {
 			glutKeyboardUpFunc (keyboardup);
 			glutSpecialFunc(special);
 			glutSpecialUpFunc(specialup);
-			//glutShowWindow();
 			initialized = true;
     	}
 

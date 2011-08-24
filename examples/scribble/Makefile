@@ -17,7 +17,7 @@ all: $(TARGET)
 	@echo $(TARGET) built
 
 $(TARGET): $(OBJECTS) $(CPROCESSINGLIB)/libcprocessing.a
-	@gcc $(CFLAGS) -o $@ $(OBJECTS) -L$(CPROCESSINGLIB) -lcprocessing -lglut -lGL -lGLU
+		gcc $(CFLAGS) -o $@ $(OBJECTS) -L$(CPROCESSINGLIB) -lcprocessing -lglut -lGL -lGLU
 
 clean:
 	rm -rf $(OBJECTS) $(TARGET)
