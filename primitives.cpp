@@ -10,12 +10,17 @@
 #include <GL/glut.h>
 #include <vector>
 #include <cassert>
+#include <iostream>
 #include "cprocessing.hpp"
 
 using namespace cprocessing;
 
 static unsigned ellipseMode = CENTER; ///< Ellipse drawing mode
 static std::vector<PVector> ellipseVtx;  ///< Vertices of circle centered at the origin and diameter 1
+
+static int ures, vres; ///< Longitude and latitude detail of a sphere
+static std::vector<PVector> sphereVtx; ///< Precomputed vertices of a sphere centered at the origin and diameter 1
+static std::vector<unsigned> sphereIdx; ///< Indices of sphere vertices traversed by a quadstrip
 
 namespace cprocessing {
 
@@ -184,4 +189,79 @@ namespace cprocessing {
 		// Restore modelview
     	glPopMatrix();
     }
-}
+
+
+	/// Controls the detail used to render a sphere by adjusting the number 
+	/// of vertices of the sphere mesh. The default resolution is 30, which creates 
+	/// a fairly detailed sphere definition with vertices every 360/30 = 12 degrees.
+	///
+	/// @arg ures: number of segments used longitudinally per full circle revolution
+	/// @arg vres: number of segments used latitudinally from top to bottom
+	void sphereDetail (int ur, int vr) {
+		ures = ur;
+		vres = vr;
+		
+		sphereVtx.clear();
+		
+		for (int itheta = 0; itheta<vr; itheta++) {
+			double theta = TWO_PI / (vr-1) * itheta;
+			double sintheta = sin(theta);
+			double costheta = cos(theta);
+			for (int iphi = 0; iphi<ur; iphi++) {
+				double phi = PI / (ur-1) * iphi;
+				double sinphi = sin(phi);
+				double cosphi = cos(phi);
+				double y = cosphi;
+				double x = sinphi*costheta;
+				double z = sinphi*sintheta;
+				sphereVtx.push_back(PVector(x,y,z));
+			}
+		}
+		
+		sphereIdx.clear();
+		for (int icol = 0; icol<vr-1; icol++) {
+			for (int irow = 0; irow<ur; irow++) {
+				sphereIdx.push_back(icol*ur+irow);
+				sphereIdx.push_back((icol+1)*ur+irow);
+			}
+		}
+	}
+	
+
+	/// Draws a sphere centered at the origin with the given radius.
+	/// @arg radius: radius of the sphere
+	void sphere(double radius) {
+		glPushMatrix();
+		glScaled(radius,radius,radius);
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glVertexPointer(3, GL_DOUBLE, 0, sphereVtx [0].array());
+		glEnableClientState(GL_NORMAL_ARRAY);
+		glNormalPointer(GL_DOUBLE, 0, sphereVtx [0].array());
+		if (fillColor.rgba[3] > 0) {
+			// See if filled sphere is required		
+			glColor4ubv (fillColor.rgba);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			glEnable(GL_POLYGON_OFFSET_FILL);
+			glDrawElements(GL_QUAD_STRIP, ures*(vres-1)*2, GL_UNSIGNED_INT, &(sphereIdx[0]));
+			glDisable(GL_POLYGON_OFFSET_FILL);
+		}
+		if (strokeColor.rgba[3] > 0) {
+			// See if outline  is required
+			glPushAttrib (GL_ENABLE_BIT);
+			glDisable(GL_LIGHTING);
+			glColor4ubv (strokeColor.rgba);
+			glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+			glDrawElements(GL_QUAD_STRIP, ures*(vres-1)*2, GL_UNSIGNED_INT, &(sphereIdx[0]));
+			glPopAttrib();
+		}
+    	// deactivate vertex arrays after drawing
+		glDisableClientState(GL_VERTEX_ARRAY);
+		glDisableClientState(GL_NORMAL_ARRAY);
+		// Restore modelview
+    	glPopMatrix();
+	}
+
+} // namespace cprocessing
+
+
+

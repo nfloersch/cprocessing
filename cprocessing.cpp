@@ -75,6 +75,18 @@ namespace cprocessing {
 	color strokeColor (0,0,0);     ///< Line drawing color
 	color fillColor   (255,255,255);   ///< Area drawing color
 
+
+	/// 
+	/// Global OpenGL initialization code
+	///
+    static void init () {
+    	glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LEQUAL);
+        glPolygonOffset (1., -1.);
+        glEnable(GL_RESCALE_NORMAL);
+	}    	
+
+
     /// This is called for each frame
     static void display () {
 
@@ -101,17 +113,15 @@ namespace cprocessing {
     static void reshape (int wid, int hgt)
     {
         glViewport(0,0,wid,hgt);
-        glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LEQUAL);
-        glPolygonOffset (1., -1.);
 
         width = wid;
         height = hgt;
 
         // Default background is gray 70%
         background (200);
-        glutSwapBuffers();
-        background (200);
+        
+        // Initialize OPENGL modes
+        init();
         
         // Reset backup buffer if needed
         if (config&BACK_BUFFER) {
@@ -268,7 +278,7 @@ namespace cprocessing {
     	}
 
     }
-
+    
     /// Initializes and runs the application main event loop
     void run() {
 		int argc = 0;
@@ -278,6 +288,7 @@ namespace cprocessing {
     	glutTimerFunc (1000/frameRate, refresh, 0);
     	bezierDetail(50);
     	ellipseDetail(50);
+    	sphereDetail(30,30);
     	::setup();
         glutMainLoop();
     }

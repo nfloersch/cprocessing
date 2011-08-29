@@ -163,8 +163,8 @@ namespace cprocessing {
     {
         ::lightsOn();
         lightSpecular(0,0,0);
-        directionalLight(128, 128, 128, 0, 0, -1);
-        ambientLight(128, 128, 128);
+        directionalLight(255, 255, 255, 0, 0, -1);
+        ambientLight(200, 200, 200);
     }
 
     // Turns off the lights

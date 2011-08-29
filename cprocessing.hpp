@@ -158,6 +158,45 @@ namespace cprocessing {
 	extern color strokeColor;  ///< Line drawing color
 	extern color fillColor;   ///< Area drawing color
 
+
+	//===========================================================================
+	//
+	// Some math utility functions and constants
+	//
+	const double PI = 3.14159265358979323846;
+	const double TWO_PI = 2*PI;
+	const double HALF_PI = PI/2;
+	const double QUARTER_PI = PI/4;
+	
+	/// Minimum between two numbers
+	///
+	template<class C>
+	inline C min(const C& a, const C& b) { return a<b ? a : b; }
+	
+	/// Maximum between two numbers
+	///
+	template<class C>
+	inline C max(const C& a, const C& b) { return a>b ? a : b; }
+	
+	/// Minimum between three numbers
+	///
+	template<class C>
+	inline C min(const C& a, const C& b, const C& c) { return a<b ? min(a,c) : min(b,c); }
+	
+	/// Maximum between three numbers
+	///
+	template<class C>
+	inline C max(const C& a, const C& b, const C& c) { return a>b ? max(a,c) : max(b,c); }
+	
+	// Magnitude of a 2D vector
+	inline double mag (double a, double b) { return sqrt(a*a+b*b); }
+	
+	// Magnitude of a 3D vector
+	inline double mag (double a, double b, double c) { return sqrt(a*a+b*b+c*c); }
+	
+	// 
+	
+	
 	//============================================================================
 	//
 	// Drawing Attributes (file attributes.cpp)
@@ -303,6 +342,21 @@ namespace cprocessing {
 	/// @arg x, y: center of the ellipse
 	/// @arg width, height: size of the ellipse axes
 	void ellipse (double x, double y, double width, double height);
+	
+	
+	/// Controls the detail used to render a sphere by adjusting the number 
+	/// of vertices of the sphere mesh. The default resolution is 30, which creates 
+	/// a fairly detailed sphere definition with vertices every 360/30 = 12 degrees.
+	///
+	/// @arg ures: number of segments used longitudinally per full circle revolution
+	/// @arg vres: number of segments used latitudinally from top to bottom
+	void sphereDetail (int ures, int vres);
+	
+	
+	/// Draws a sphere centered at the origin with the given radius.
+	/// @arg radius: radius of the sphere
+	void sphere(double radius);
+    
 	
 	//========================================================================
 	//
