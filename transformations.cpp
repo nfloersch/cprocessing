@@ -24,8 +24,8 @@ namespace cprocessing {
 	}
 
 	/// Applies a rotation transformation
-	void rotate (double degrees, double axisx, double axisy, double axisz) {
-		glRotatef (degrees, axisx, axisy, axisz);
+	void rotate (double radians, double axisx, double axisy, double axisz) {
+		glRotatef (degrees(radians), axisx, axisy, axisz);
 	}
 
 	/// Resets the transformation to none

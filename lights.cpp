@@ -7,10 +7,11 @@
 
 #include "cprocessing.hpp"
 #include <GL/glut.h>
+#include <iostream>
 
 static bool lights = false; ///< Whether lighting is turned on or off
 static int lightCount = 0;  ///< How many light sources were defined
-static float specular[4] = {0,0,0,0};   ///< Specular coefficients
+static float specular[4] = {0,0,0,1};   ///< Specular coefficients
 static float constant = 1;    ///< Light attenuation coefficients
 static float linear = 0;
 static float quadratic = 0;
@@ -41,20 +42,20 @@ namespace cprocessing {
         float fc [4]; c.toFloat(fc);
         int n = GL_LIGHT0 + ::lightCount;
         ::lightCount ++;
-        float position[] = {nx, ny, nz,0};
-        float ambient[] = {0,0,0};
-        float direction[] = {0,0,-1};
-        glLightfv(n, GL_DIFFUSE, fc);
-        glLightfv(n, GL_AMBIENT, ambient);
-        glLightfv(n, GL_SPECULAR, specular);
-        glLightfv(n, GL_POSITION, position);
-        glLightfv(n, GL_SPOT_DIRECTION, direction);
-        glLightf(n, GL_SPOT_EXPONENT, 0);
-        glLightf(n, GL_SPOT_CUTOFF, 180);
-        glLightf(n, GL_LINEAR_ATTENUATION, linear);
-        glLightf(n, GL_QUADRATIC_ATTENUATION, quadratic);
-        glLightf(n, GL_CONSTANT_ATTENUATION, constant);
-        glEnable(n);
+        float position[] = {-nx, -ny, -nz, 0};
+        float ambient[] = {0,0,0,1};
+        float direction[] = {nx,ny,nz};
+        glLightfv (n, GL_DIFFUSE, fc);
+        glLightfv (n, GL_AMBIENT, ambient);
+        glLightfv (n, GL_SPECULAR, specular);
+        glLightfv (n, GL_POSITION, position);
+        glLightfv (n, GL_SPOT_DIRECTION, direction);
+        glLightf (n, GL_SPOT_EXPONENT, 0);
+        glLightf (n, GL_SPOT_CUTOFF, 180);
+        glLightf (n, GL_LINEAR_ATTENUATION, linear);
+        glLightf (n, GL_QUADRATIC_ATTENUATION, quadratic);
+        glLightf (n, GL_CONSTANT_ATTENUATION, constant);
+        glEnable (n);
     }
 
     /// Defines a new directional light.
@@ -68,8 +69,8 @@ namespace cprocessing {
         int n = GL_LIGHT0 + ::lightCount;
         ::lightCount ++;
         float  position[] = {x, y, z, 1};
-        float ambient[] = {0,0,0};
-        float direction[] = {0,0,-1};
+        float ambient[] = {0, 0, 0, 1};
+        float direction[] = {0, 0, -1};
         glLightfv(n, GL_DIFFUSE, fc);
         glLightfv(n, GL_AMBIENT, ambient);
         glLightfv(n, GL_SPECULAR, specular);
@@ -162,9 +163,11 @@ namespace cprocessing {
     void lights()
     {
         ::lightsOn();
+        ::lightCount = 0;
         lightSpecular(0,0,0);
-        directionalLight(255, 255, 255, 0, 0, -1);
-        ambientLight(200, 200, 200);
+        lightFalloff(1, 0, 0);
+        directionalLight(128, 128, 128, 0, 0, -1);
+        ambientLight(128, 128, 128);
     }
 
     // Turns off the lights

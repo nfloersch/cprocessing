@@ -18,9 +18,33 @@ using namespace cprocessing;
 static unsigned ellipseMode = CENTER; ///< Ellipse drawing mode
 static std::vector<PVector> ellipseVtx;  ///< Vertices of circle centered at the origin and diameter 1
 
-static int ures, vres; ///< Longitude and latitude detail of a sphere
+static int ures, vres; ///< number of vertices in the longitude and latitude directions of a sphere
 static std::vector<PVector> sphereVtx; ///< Precomputed vertices of a sphere centered at the origin and diameter 1
 static std::vector<unsigned> sphereIdx; ///< Indices of sphere vertices traversed by a quadstrip
+
+//    v6----- v5
+//   /|      /|
+//  v1------v0|
+//  | |     | |
+//  | |v7---|-|v4
+//  |/      |/
+//  v2------v3
+//
+static double boxVtx [] =  ///< Vertex coordinates of faces of box with size 2 centered at the origin. 
+					 {1,1,1,  -1,1,1,  -1,-1,1,  1,-1,1,        // v0-v1-v2-v3
+                      1,1,1,  1,-1,1,  1,-1,-1,  1,1,-1,        // v0-v3-v4-v5
+                      1,1,1,  1,1,-1,  -1,1,-1,  -1,1,1,        // v0-v5-v6-v1
+                      -1,1,1,  -1,1,-1,  -1,-1,-1,  -1,-1,1,    // v1-v6-v7-v2
+                      -1,-1,-1,  1,-1,-1,  1,-1,1,  -1,-1,1,    // v7-v4-v3-v2
+                      1,-1,-1,  -1,-1,-1,  -1,1,-1,  1,1,-1};   // v4-v7-v6-v5
+
+static double boxNrm [] =  ///< Normal coordinates of faces of box 
+					{0,0,1,  0,0,1,  0,0,1,  0,0,1,             // v0-v1-v2-v3
+                     1,0,0,  1,0,0,  1,0,0, 1,0,0,              // v0-v3-v4-v5
+                     0,1,0,  0,1,0,  0,1,0, 0,1,0,              // v0-v5-v6-v1
+                     -1,0,0,  -1,0,0, -1,0,0,  -1,0,0,          // v1-v6-v7-v2
+                     0,-1,0,  0,-1,0,  0,-1,0,  0,-1,0,         // v7-v4-v3-v2
+                     0,0,-1,  0,0,-1,  0,0,-1,  0,0,-1};        // v4-v7-v6-v5   
 
 namespace cprocessing {
 
@@ -248,7 +272,7 @@ namespace cprocessing {
 		if (strokeColor.rgba[3] > 0) {
 			// See if outline  is required
 			glPushAttrib (GL_ENABLE_BIT);
-			glDisable(GL_LIGHTING);
+			glDisable(GL_LIGHTING); // lines are not illuminated in processing
 			glColor4ubv (strokeColor.rgba);
 			glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
 			glDrawElements(GL_QUAD_STRIP, ures*(vres-1)*2, GL_UNSIGNED_INT, &(sphereIdx[0]));
@@ -261,6 +285,41 @@ namespace cprocessing {
     	glPopMatrix();
 	}
 
+
+	/// Draws a parallelepiped centered at the origin
+	/// @arg width: x size
+	/// @arg height: y size
+	/// @arg depth: z size
+	void box(double width, double height, double depth) {
+		glPushMatrix();
+		glScaled(width/2,height/2,depth/2);
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glVertexPointer(3, GL_DOUBLE, 0, boxVtx);
+		glEnableClientState(GL_NORMAL_ARRAY);
+		glNormalPointer(GL_DOUBLE, 0, boxNrm);
+		if (fillColor.rgba[3] > 0) {
+			// See if filled box is required		
+			glColor4ubv (fillColor.rgba);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			glEnable(GL_POLYGON_OFFSET_FILL);
+			glDrawArrays(GL_QUADS, 0, 24);
+			glDisable(GL_POLYGON_OFFSET_FILL);
+		}
+		if (strokeColor.rgba[3] > 0) {
+			// See if outline  is required
+			glPushAttrib (GL_ENABLE_BIT);
+			glDisable(GL_LIGHTING); // lines are not illuminated in processing
+			glColor4ubv (strokeColor.rgba);
+			glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+			glDrawArrays(GL_QUADS, 0, 24);
+			glPopAttrib();
+		}
+    	// deactivate vertex arrays after drawing
+		glDisableClientState(GL_VERTEX_ARRAY);
+		glDisableClientState(GL_NORMAL_ARRAY);
+		// Restore modelview
+    	glPopMatrix();		
+	}
 } // namespace cprocessing
 
 

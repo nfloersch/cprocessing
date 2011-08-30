@@ -188,15 +188,47 @@ namespace cprocessing {
 	template<class C>
 	inline C max(const C& a, const C& b, const C& c) { return a>b ? max(a,c) : max(b,c); }
 	
+	// Constrain value to a certain range
+	template<class C>
+	inline C constrain(const C& a, const C& minv, const C& maxv) { return min(maxv,max(minv,a)); }
+	
 	// Magnitude of a 2D vector
 	inline double mag (double a, double b) { return sqrt(a*a+b*b); }
 	
 	// Magnitude of a 3D vector
 	inline double mag (double a, double b, double c) { return sqrt(a*a+b*b+c*c); }
 	
-	// 
+	// Distance between 2 2D points
+	inline double dist (double x1, double y1, double x2, double y2) { return mag(x2-x1,y2-y1); }
+
+	// Distance between 2 3D points
+	inline double dist (double x1, double y1, double z1, double x2, double y2, double z2) { return mag(x2-x1,y2-y1,z2-z1); }
 	
+	// Linear interpolation
+	inline double lerp (double value1, double value2, double amt) { return value1*(1-amt)+value2*amt; }
 	
+	// Maps a ratio between an interval to another interval
+	inline double map(double value,double low1, double high1, double low2, double high2) {
+    	return (value-low1)/(high1-low1)*(high2-low2)+low2;
+    }
+	
+	// Normalizes a number from another range into a value between 0 and 1.
+	// Identical to map(value, low, high, 0, 1)
+	inline double norm(double value,double low,double high) { return (value-low)/(high-low); }
+	
+	// Rounds a value to the closest int
+	inline int round(double value) { return int(value+0.5); }
+	
+	// Square of a value
+	inline double sq(double value) { return value*value; }
+	
+	// Converts from radians to degrees
+	inline double degrees(double radians) { return radians / PI * 180; }
+	
+	// Converts from degrees to radians
+	inline double radians(double degrees) { return degrees * PI / 180; }
+	
+
 	//============================================================================
 	//
 	// Drawing Attributes (file attributes.cpp)
@@ -352,10 +384,19 @@ namespace cprocessing {
 	/// @arg vres: number of segments used latitudinally from top to bottom
 	void sphereDetail (int ures, int vres);
 	
+	inline void sphereDetail (int res) { sphereDetail (res,res); }
 	
 	/// Draws a sphere centered at the origin with the given radius.
 	/// @arg radius: radius of the sphere
 	void sphere(double radius);
+	
+	/// Draws a parallelepiped centered at the origin
+	/// @arg width: x size
+	/// @arg height: y size
+	/// @arg depth: z size
+	void box(double width, double height, double depth);
+	
+	inline void box(double size) { box(size,size,size); }
     
 	
 	//========================================================================
@@ -425,7 +466,12 @@ namespace cprocessing {
     inline void scale (double factor) { scale (factor, factor, factor); }
 
     /// Applies a rotation transformation
-    void rotate (double degrees, double axisx, double axisy, double axisz);
+    void rotate (double radians, double axisx, double axisy, double axisz);
+    
+	inline void rotateX (double radians) { rotate(radians, 1, 0, 0); }
+	inline void rotateY (double radians) { rotate(radians, 0, 1, 0); }
+	inline void rotateZ (double radians) { rotate(radians, 0, 0, 1); }
+	inline void rotate (double radians) { rotateZ(radians); }
 
     /// Resets the transformation to none
     void resetMatrix();
@@ -471,7 +517,6 @@ namespace cprocessing {
 	void ortho(double left, double right, double bottom, double top, double near, double far);
 
 	void ortho ();
-
 
     /// Returns the projected space coordinates of object coordinates ox,oy,oz
 	void screenXYZ (double ox, double oy, double oz,

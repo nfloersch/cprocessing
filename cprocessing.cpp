@@ -77,13 +77,33 @@ namespace cprocessing {
 
 
 	/// 
-	/// Global OpenGL initialization code
+	/// Global OpenGL initialization code. Should be called at least once when screen is established
 	///
     static void init () {
+    
+    	// Enable depth buffer
     	glEnable(GL_DEPTH_TEST);
+    	
+    	// Make it possible to overwrite pixels
         glDepthFunc(GL_LEQUAL);
+        
+        // Helps when drawing in 3D with wireframe superimposed on the filled faces
         glPolygonOffset (1., -1.);
+        
+        // Cope with scaling transformations
         glEnable(GL_RESCALE_NORMAL);
+        
+        // Disable the default additional ambient component
+        float ambient [] = {0, 0, 0, 1};
+        glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient);
+ 
+		// By default, y is flipped, so front is clockwise
+		glFrontFace(GL_CW);
+
+    	// Make it possible to set material properties by using glcolor
+	    glEnable(GL_COLOR_MATERIAL);
+	    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+    	glColorMaterial(GL_FRONT_AND_BACK, GL_SPECULAR);
 	}    	
 
 
@@ -93,9 +113,10 @@ namespace cprocessing {
 		// Restore backing buffer if needed
 		if (config&BACK_BUFFER) writebuffer();
         
-        // Default transformation
+        // Restore default state
         camera();
         perspective();
+        noLights();
 
         // Call external display function
         ::draw();
