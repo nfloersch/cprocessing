@@ -6,8 +6,10 @@
  */
 
 #include <GL/glut.h>
+#include <iostream>
 #include "cprocessing.hpp"
 
+using namespace cprocessing;
 
 inline unsigned char clamp(double v) {
     return v > 255 ? 255 : v < 0 ? 0 : (unsigned char) v;
@@ -37,11 +39,8 @@ static void hsb_to_rgb (double h, double s, double v,
         r = v; g = p; b = q;
     }
 }
-
-// Some useful defines
-inline double max (double a, double b) { return a>b? a: b; }
-inline double min (double a, double b) { return a<b? a: b; }
-
+    
+    
 // Simple rgb to hsb conversion. Assumes components specified in range 0.0-1.0.
 static void rgb_to_hsb (double r, double g, double b,
                         double& h, double& s, double& v)
@@ -67,18 +66,37 @@ static void rgb_to_hsb (double r, double g, double b,
     v = maxval;
 }
 
+/// Tells which color space is actually used for color specification
+static unsigned globColorMode = RGB;
 
+
+/// Maximum range values for color components. Specified by the colorMode() function.
+static double max1 = 255;  // First component
+static double max2 = 255;  // Second component
+static double max3 = 255;  // Third component
+static double maxA = 255;  // Alpha component
 
 namespace cprocessing {
     //
     // Attributes
     //
     /// Constructor for the color class
-    color::color(double R, double G, double B, double A) {
-        rgba[0] = clamp(R);
-        rgba[1] = clamp(G);
-        rgba[2] = clamp(B);
-        rgba[3] = clamp(A);
+    color::color(double val1, double val2, double val3, double valA) {
+		//SCale the values to a range of 255
+		val1 = val1/max1; 
+		val2 = val2/max2;
+		val3 = val3/max3;
+		if (valA == MAXCOLOR) valA = 1.0;
+		else valA = valA/maxA;
+		
+		if (globColorMode != RGB) {
+			hsb_to_rgb(val1, val2, val3, val1, val2, val3);
+		}
+		
+		rgba[0] = clamp(val1*255);
+		rgba[1] = clamp(val2*255);
+		rgba[2] = clamp(val3*255);
+		rgba[3] = clamp(valA*255);
     };
 
     /// Converts color to a float array
@@ -96,6 +114,62 @@ namespace cprocessing {
         a [2] = rgba[2]*1.0/255;
         a [3] = rgba[3]*1.0/255;
     }
+
+
+    /// Changes the way Processing interprets color data.
+    /// The colorMode() function is used to change the numerical range used for specifying colors and to switch color systems.
+    void colorMode(unsigned mode, double range1, double range2, double range3, double range4){
+        if (mode == RGB || mode == HSB){
+            globColorMode = mode;
+        }
+        max1 = range1;
+        max2 = range2;
+        max3 = range3;
+        maxA = range4;
+    }
+	
+	/// Extracts the alpha value from a color, scaled to match current colorMode()
+    double alpha(const color & color){
+        return double(color.rgba[3])/255*maxA;
+    }
+	
+	/// Extracts the red value from a color, scaled to match current colorMode()
+    double red(const color & color){
+        return double(color.rgba[0])/255*max1;
+    }
+
+	/// Extracts the green value from a color, scaled to match current colorMode()
+    double green(const color & color){
+        return double(color.rgba[1])/255*max2;
+    }
+
+	/// Extracts the blue value from a color, scaled to match current colorMode()
+    double blue(const color & color){
+        return double(color.rgba[2])/255*max3;
+    }
+
+	/// Extracts the hue value from a color, scaled to match current colorMode()
+    double hue(const color & color){
+        double h, s, v;
+        rgb_to_hsb(color.rgba[0]/255.0,color.rgba[1]/255.0,color.rgba[2]/255.0,h,s,v);
+        return h*max1;
+    }
+	
+	/// Extracts the saturation value from a color, scaled to match current colorMode()
+    double saturation(const color & color){
+        double h, s, v;
+        rgb_to_hsb(color.rgba[0]/255.0,color.rgba[1]/255.0,color.rgba[2]/255.0,h,s,v);
+        return h*max1;
+        return s*max2;
+    }
+	
+	/// Extracts the brightness value from a color, scaled to match current colorMode()
+    double brightness(const color & color){
+        double h, s, v;
+        rgb_to_hsb(color.rgba[0]/255.0,color.rgba[1]/255.0,color.rgba[2]/255.0,h,s,v);
+        return v*max3;
+    }
+
 
     /// Sets line color
     /// @param color: New line color

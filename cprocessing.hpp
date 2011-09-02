@@ -23,7 +23,7 @@ namespace cprocessing {
 	/// Other constants
 	enum { F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12,
 		   UP, DOWN, LEFT, RIGHT, CENTER, PAGEUP, PAGEDOWN, HOME, END, INSERT,
-		   RADIUS, CORNER, CORNERS 
+		   RADIUS, CORNER, CORNERS, RGB, HSB
 	};
 
 	/// Configuration flags
@@ -44,11 +44,13 @@ namespace cprocessing {
 		OPEN = 0, CLOSE = 1
 	} ShapeClose;
 
+    #define MAXCOLOR 1e10
+    
 	/// Color class
 	struct color {
 		unsigned char rgba[4];
 		/// Constructor
-		color (double r, double g, double b, double a = 255);
+		color (double r, double g, double b, double a = MAXCOLOR);
 		/// Fills a float array with color values scaled for the interval 0..1
 		void toFloat(float a[]);
 		/// Fills a double array with color values scaled for the interval 0..1
@@ -234,14 +236,53 @@ namespace cprocessing {
 	// Drawing Attributes (file attributes.cpp)
 	//
 
+
+	/// Changes the way Processing interprets color data.
+	/// The colorMode() function is used to change the numerical range used for specifying colors and to switch color systems.
+	void colorMode(unsigned mode, double range1, double range2, double range3, double range4);
+
+	inline void colorMode(unsigned mode){
+		colorMode(mode, 255, 255, 255, 255);
+	}
+
+	inline void colorMode(unsigned mode, double range){
+		colorMode(mode, range, range, range, range);
+	}
+
+	inline void colorMode(unsigned mode, double range1, double range2, double range3){
+		colorMode(mode, range1, range2, range3, 255);
+	}
+
+	/// Extracts the alpha value from a color, scaled to match current colorMode()
+	double alpha(const color & color);
+	
+	/// Extracts the red value from a color, scaled to match current colorMode()
+	double red(const color & color);
+	
+	/// Extracts the green value from a color, scaled to match current colorMode()
+	double green(const color & color);
+	
+	/// Extracts the blue value from a color, scaled to match current colorMode()
+	double blue(const color & color);
+	
+	/// Extracts the hue value from a color, scaled to match current colorMode()
+	double hue(const color & color);
+	
+	/// Extracts the saturation value from a color, scaled to match current colorMode()
+	double saturation(const color & color);
+	
+	/// Extracts the brightness value from a color, scaled to match current colorMode()
+	double brightness(const color & color);
+	
+	
 	/// Sets line color
 	void stroke (const color& c);
 
-	inline void stroke (double r, double g, double b, double a = 255) {
+	inline void stroke (double r, double g, double b, double a = MAXCOLOR) {
 		stroke (color (r,g,b,a));
 	}
 
-	inline void stroke (double gray, double a = 255) {
+	inline void stroke (double gray, double a = MAXCOLOR) {
 		stroke (color (gray,gray,gray,a));
 	}
 
@@ -252,11 +293,11 @@ namespace cprocessing {
 	/// Sets fill color
 	void fill (const color & color);
 
-	inline void fill (double r, double g, double b, double a = 255) {
+	inline void fill (double r, double g, double b, double a = MAXCOLOR) {
 		fill (color (r,g,b,a));
 	}
 
-	inline void fill (double gray, double a = 255) {
+	inline void fill (double gray, double a = MAXCOLOR) {
 		fill (color (gray,gray,gray,a));
 	}
 
@@ -270,11 +311,11 @@ namespace cprocessing {
 	/// Draws background with given color
 	void background (const color&);
 
-	inline void background (double r, double g, double b, double a = 255) {
+	inline void background (double r, double g, double b, double a = MAXCOLOR) {
 		background (color (r,g,b,a));
 	}
 
-	inline void background (double gray, double a = 255) {
+	inline void background (double gray, double a = MAXCOLOR) {
 		background (color (gray,gray,gray,a));
 	}
 
