@@ -51,6 +51,8 @@ namespace cprocessing {
 		unsigned char rgba[4];
 		/// Constructor
 		color (double r, double g, double b, double a = MAXCOLOR);
+		/// Constructor for gray values
+		color (double gray, double alpha = MAXCOLOR);
 		/// Fills a float array with color values scaled for the interval 0..1
 		void toFloat(float a[]);
 		/// Fills a double array with color values scaled for the interval 0..1
@@ -241,16 +243,14 @@ namespace cprocessing {
 	/// The colorMode() function is used to change the numerical range used for specifying colors and to switch color systems.
 	void colorMode(unsigned mode, double range1, double range2, double range3, double range4);
 
-	inline void colorMode(unsigned mode){
-		colorMode(mode, 255, 255, 255, 255);
-	}
+	void colorMode(unsigned mode);
 
 	inline void colorMode(unsigned mode, double range){
 		colorMode(mode, range, range, range, range);
 	}
 
 	inline void colorMode(unsigned mode, double range1, double range2, double range3){
-		colorMode(mode, range1, range2, range3, 255);
+		colorMode(mode, range1, range2, range3, MAXCOLOR);
 	}
 
 	/// Extracts the alpha value from a color, scaled to match current colorMode()
@@ -283,7 +283,7 @@ namespace cprocessing {
 	}
 
 	inline void stroke (double gray, double a = MAXCOLOR) {
-		stroke (color (gray,gray,gray,a));
+		stroke (color (gray,a));
 	}
 
 	inline void noStroke() {
@@ -298,7 +298,7 @@ namespace cprocessing {
 	}
 
 	inline void fill (double gray, double a = MAXCOLOR) {
-		fill (color (gray,gray,gray,a));
+		fill (color (gray,a));
 	}
 
 	inline void noFill() {
@@ -316,7 +316,7 @@ namespace cprocessing {
 	}
 
 	inline void background (double gray, double a = MAXCOLOR) {
-		background (color (gray,gray,gray,a));
+		background (color (gray,a));
 	}
 
 	// Line smoothing

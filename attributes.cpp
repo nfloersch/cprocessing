@@ -99,6 +99,16 @@ namespace cprocessing {
 		rgba[3] = clamp(valA*255);
     };
 
+    // Constructor from a gray value
+    color::color(double gray, double alpha){
+	    if (alpha == MAXCOLOR) { alpha = maxA;}
+	    unsigned char val = clamp(gray/max1*255);
+	    rgba[0] = val;
+	    rgba[1] = val;
+	    rgba[2] = val;
+	    rgba[3] = clamp(alpha/maxA*255);
+    }
+
     /// Converts color to a float array
     void color::toFloat(float a[]) {
         a [0] = rgba[0]*1.0/255;
@@ -125,8 +135,15 @@ namespace cprocessing {
         max1 = range1;
         max2 = range2;
         max3 = range3;
-        maxA = range4;
+        if (range4 != MAXCOLOR) maxA = range4;
     }
+    
+    // When changing just the color system, ranges are kept as is
+    void colorMode(unsigned mode){
+        if (mode == RGB || mode == HSB){
+            globColorMode = mode;
+        }
+     }
 	
 	/// Extracts the alpha value from a color, scaled to match current colorMode()
     double alpha(const color & color){
@@ -159,7 +176,6 @@ namespace cprocessing {
     double saturation(const color & color){
         double h, s, v;
         rgb_to_hsb(color.rgba[0]/255.0,color.rgba[1]/255.0,color.rgba[2]/255.0,h,s,v);
-        return h*max1;
         return s*max2;
     }
 	
