@@ -8,6 +8,7 @@
 #ifndef CPROCESSING_HPP_
 #define CPROCESSING_HPP_
 #include <cmath>
+#include <cassert>
 
 namespace cprocessing {
 
@@ -23,7 +24,7 @@ namespace cprocessing {
 	/// Other constants
 	enum { F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12,
 		   UP, DOWN, LEFT, RIGHT, CENTER, PAGEUP, PAGEDOWN, HOME, END, INSERT,
-		   RADIUS, CORNER, CORNERS, RGB, HSB
+		   RADIUS, CORNER, CORNERS, RGB, HSB, ARGB, ALPHA
 	};
 
 	/// Configuration flags
@@ -49,6 +50,8 @@ namespace cprocessing {
 	/// Color class
 	struct color {
 		unsigned char rgba[4];
+		/// Empty constructor
+		color () {}
 		/// Constructor
 		color (double r, double g, double b, double a = MAXCOLOR);
 		/// Constructor for gray values
@@ -58,6 +61,43 @@ namespace cprocessing {
 		/// Fills a double array with color values scaled for the interval 0..1
 		void toDouble(double a[]);
 	};
+	
+	/// Encapsulates a 2D RGBA image
+	class PImage {
+	public:
+	    color * pixels;  ///< Where the pixels are actually stored. Stored row by row
+	                     /// from top (row 0) to bottom
+	    int width;       ///< width of the image (size of row)
+	    int height;      ///< height of the image (number of rows)
+	    
+	    /// Constructor
+	    /// @arg width horizontal size
+	    /// @arg height vertical size
+	    /// @arg type ARGB, RGB or ALPHA
+	    PImage (int width, int height, int type = ARGB);
+	    
+	    /// Destructor
+	    ~PImage ();
+	    
+	    /// Returns a copy of this image
+	    PImage get(); 
+	    
+	    /// Returns a copy of a subrectangle of this image
+	    PImage get (int x, int y, int w, int h);
+    
+	    /// Returns the pixel at coordinate (x,y) 
+	    inline color get(int x, int y) {
+	        assert(x >=0 && x < width && y >= 0 && y < height && pixels!=0);
+	        return pixels[y*width+x];
+	    }	    
+	    
+	    /// Draws the image at position (x, y) of the screen
+	    void put (int x, int y);
+	    
+	    /// Draws the image at position (x, y) of the screen with the given width and height
+	    void put (int x, int y, int w, int h);	    
+	};
+	
 
 	/// Represents a vector (or, sometimes, a point) in 3D
 	class PVector {
