@@ -22,6 +22,7 @@ extern void keyReleased();
 
 using namespace cprocessing;
 
+bool mouseRecordFlag = true; // When to record or not the mouse position
 /// Variables and functions to maintain a backup buffer
 char * backbuffer = 0;
 
@@ -120,6 +121,7 @@ namespace cprocessing {
 
         // Call external display function
         ::draw();
+        mouseRecordFlag = true;
 
 		// Refresh backing buffer if needed
 		if (config&BACK_BUFFER) readbuffer();
@@ -160,39 +162,44 @@ namespace cprocessing {
 
     /// Called whenever mouse moves
     static void mousemotion (int x, int y) {
-    	pmouseX = mouseX;
-    	pmouseY = mouseY;
-    	mouseX = x;
-    	mouseY = y;
+      if (mouseRecordFlag){
+         pmouseX = mouseX;
+         pmouseY = mouseY;
+         mouseX = x;
+         mouseY = y;
+         mouseRecordFlag = false;
+      }
+      ::mouseMoved();
     	if (mousePressed) {
     		::mouseDragged();
-    	} else {
-    		::mouseReleased();
     	}
     }
 
     /// Called whenever mouse button is pressed
     static void mouse (int button, int state, int x, int y) {
+       if (mouseRecordFlag){
+         pmouseX = mouseX;
+         pmouseY = mouseY;
+         mouseX = x;
+         mouseY = y;
+         mouseRecordFlag = false;
+       }
 
-    	pmouseX = mouseX;
-    	pmouseY = mouseY;
-    	mouseX = x;
-      	mouseY = y;
-      	mousePressed = state == GLUT_DOWN;
-
-      	if (button == GLUT_LEFT_BUTTON) {
-      		mouseButton = LEFT;
-      	} else if (button == GLUT_RIGHT_BUTTON) {
-      		mouseButton = RIGHT;
-      	} else {
-      		mouseButton = CENTER;
-      	}
-      	if (mousePressed) {
-      		::mousePressed();
-      	}
-      	else {
-      		::mouseReleased();
-      	}
+       mousePressed = state == GLUT_DOWN;
+  
+       if (button == GLUT_LEFT_BUTTON) {
+          mouseButton = LEFT;
+       } else if (button == GLUT_RIGHT_BUTTON) {
+          mouseButton = RIGHT;
+       } else {
+          mouseButton = CENTER;
+       }
+       if (mousePressed) {
+          ::mousePressed();
+       }
+       else {
+          ::mouseReleased();
+       }
     }
 
     /// Called whenever a key is pressed
