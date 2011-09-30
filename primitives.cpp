@@ -15,6 +15,7 @@
 
 using namespace cprocessing;
 
+static unsigned rectMode = CORNER;  ///< Rectangle drawing mode
 static unsigned ellipseMode = CENTER; ///< Ellipse drawing mode
 static std::vector<PVector> ellipseVtx;  ///< Vertices of circle centered at the origin and diameter 1
 
@@ -143,7 +144,36 @@ namespace cprocessing {
 		}
 	}
 	
-		
+	/// Configures the way the 'rect' function interprets its arguments
+	/// @arg mode: either CENTER, RADIUS, CORNER or CORNERS
+	void rectMode (unsigned mode) {
+		assert (mode == CENTER || mode == RADIUS || mode == CORNER || mode == CORNERS);
+		::rectMode = mode;
+	}
+
+	/// Draws an rectangle. The meaning of the arguments depend on the current
+	/// rectMode. By default:
+	/// @arg x, y: upper left corner of the rectangle
+	/// @arg a, b: width and height of the rectangle
+	void rect (double x, double y, double a, double b) 
+	{
+		// Make changes to arguments to reflect the current rectMode
+		switch (::rectMode) {
+		case CORNER:
+			quad (x, y, x+a, y, x+a, y+b, x, y+b);
+			break;
+		case CENTER:
+			quad (x-a/2, y-b/2, x+a/2, y-b/2, x+a/2, y+b/2, x-a/2, y+b/2);
+        		break;
+        	case RADIUS:
+			quad (x-a, y-b, x+a, y-b, x+a, y+b, x-a, y+b);
+		   	break;
+		case CORNERS:
+			quad (x, y, a, y, a, b, x, b);
+		   	break;
+		}
+	}
+
 	/// Configures the number of line segments used for drawing an ellipse
 	/// @arg n: number of sides
 	void ellipseDetail (unsigned n) {

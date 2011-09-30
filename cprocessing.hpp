@@ -393,17 +393,17 @@ namespace cprocessing {
 	/// Draws a filled 3D triangle given the coordinates
 	/// of its vertices.
 	/// @param x0 The x coordinate of the first vertex
-    /// @param y0 The y coordinate of the first vertex
-    /// @param z0 The z coordinate of the first vertex
-    /// @param x1 The x coordinate of the second vertex
+    	/// @param y0 The y coordinate of the first vertex
+    	/// @param z0 The z coordinate of the first vertex
+    	/// @param x1 The x coordinate of the second vertex
 	/// @param y1 The y coordinate of the second vertex
-    /// @param z1 The z coordinate of the second vertex
+    	/// @param z1 The z coordinate of the second vertex
 	/// @param x2 The x coordinate of the third vertex
-    /// @param y2 The y coordinate of the third vertex
-    /// @param z2 The z coordinate of the third vertex
-    void triangle (double x0, double y0, double z0,
+    	/// @param y2 The y coordinate of the third vertex
+    	/// @param z2 The z coordinate of the third vertex
+    	void triangle (double x0, double y0, double z0,
     		       double x1, double y1, double z1,
-    			   double x2, double y2, double z2) ;
+    			double x2, double y2, double z2) ;
 
 	/// Draws a filled 2D triangle given the coordinates
 	/// of its vertices.
@@ -413,13 +413,13 @@ namespace cprocessing {
 	/// @param y1 The y coordinate of the second vertex
 	/// @param x2 The x coordinate of the third vertex
 	/// @param y2 The y coordinate of the third vertex
-    inline void triangle (double x0, double y0,
+        inline void triangle (double x0, double y0,
     		              double x1, double y1,
-    			          double x2, double y2) {
-    	triangle (x0, y0, 0, x1, y1, 0, x2, y2, 0);
-    }
+    			      double x2, double y2) {
+    		triangle (x0, y0, 0, x1, y1, 0, x2, y2, 0);
+    	}
 
-    /// Draws a filled 2D quadrilateral given the coordinates
+    	/// Draws a filled 2D quadrilateral given the coordinates
 	/// of its vertices.
 	/// @param x0 The x coordinate of the first vertex
 	/// @param y0 The y coordinate of the first vertex
@@ -429,19 +429,28 @@ namespace cprocessing {
 	/// @param y2 The y coordinate of the third vertex
 	/// @param x3 The x coordinate of the third vertex
 	/// @param y3 The y coordinate of the third vertex
-     void quad (double x0, double y0,
+     	void quad (double x0, double y0,
     		    double x1, double y1,
-    	        double x2, double y2,
-    	        double x3, double y3);
+    	            double x2, double y2,
+    	            double x3, double y3);
 
 
-    /// Draws a point.
+    	/// Draws a point.
 	/// @param x The x coordinate of the point
 	/// @param y The y coordinate of the point
 	/// @param z The z coordinate of the point
 	void point (double x, double y, double z = 0);
 	
-	
+	/// Configures the way the 'rect' function interprets its arguments
+	/// @arg mode: either CENTER, RADIUS, CORNER or CORNERS
+	void rectMode (unsigned mode);
+
+	/// Draws an rectangle. The meaning of the arguments depend on the current
+	/// rectMode. By default:
+	/// @arg x, y: upper left corner of the rectangle
+	/// @arg a, b: width and height of the rectangle
+	void rect (double x, double y, double a, double b);
+
 	/// Configures the number of line segments used for drawing an ellipse
 	/// @arg n: number of sides
 	void ellipseDetail (unsigned n);
