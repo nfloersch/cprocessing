@@ -9,8 +9,12 @@
 
 using namespace cprocessing;
 
+void setup() {
+    size (400,400);
+}
+    
 void draw() {
-	//background (100,0,0);
+	background (200);
 	ellipse(56, 46, 55, 55);
 }
 

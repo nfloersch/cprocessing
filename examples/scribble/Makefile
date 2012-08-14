@@ -1,7 +1,13 @@
 #
-# Generic makefile for making an example program using the cprocessing library
+# Generic makefile for Mac OSX an example program using the cprocessing library
 #
+OSTYPE := $(shell uname)
 CFLAGS = -g -fPIC
+
+LDFLAGS	= -lGL -lglut -lGLU
+ifeq ("$(OSTYPE)", "Darwin")
+	LDFLAGS	= -framework Carbon -framework OpenGL -framework GLUT
+endif
 
 CPROCESSINGPATH=../..
 
@@ -17,11 +23,11 @@ all: $(TARGET)
 	@echo $(TARGET) built
 
 $(TARGET): $(OBJECTS) $(CPROCESSINGLIB)/libcprocessing.a
-		gcc $(CFLAGS) -o $@ $(OBJECTS) -L$(CPROCESSINGLIB) -lcprocessing -lglut -lGL -lGLU
+	@g++ $(CFLAGS) -o $@ $(OBJECTS) -L$(CPROCESSINGLIB) $(LDFLAGS) -lcprocessing 
 
 clean:
 	rm -rf $(OBJECTS) $(TARGET)
 
 %.o: %.cpp $(CPROCESSINGPATH)/cprocessing.hpp
 	@echo compiling $<
-	@gcc $(CFLAGS) -c $< -o $@ -I$(CPROCESSINGPATH)
+	@g++ $(CFLAGS) -c $< -o $@ -I$(CPROCESSINGPATH)
