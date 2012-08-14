@@ -1,0 +1,28 @@
+#
+# Generic makefile for making an example program using the cprocessing library
+#
+MACLIBS = -framework GLUT -framework OPENGL
+CFLAGS = -g -fPIC
+
+CPROCESSINGPATH=../..
+
+CPROCESSINGLIB=$(CPROCESSINGPATH)/objects
+
+SOURCES= $(wildcard *.cpp)
+
+OBJECTS=$(patsubst %.cpp, %.o, $(SOURCES))
+
+TARGET=$(lastword $(subst /, ,$(realpath .)))
+
+all: $(TARGET)
+	@echo $(TARGET) built
+
+$(TARGET): $(OBJECTS) $(CPROCESSINGLIB)/libcprocessing.a
+		g++ $(CFLAGS) -o $@ $(OBJECTS) -L$(CPROCESSINGLIB) -lcprocessing $(MACLIBS)
+
+clean:
+	rm -rf $(OBJECTS) $(TARGET)
+
+%.o: %.cpp $(CPROCESSINGPATH)/cprocessing.hpp
+	@echo compiling $<
+	@gcc $(CFLAGS) -c $< -o $@ -I$(CPROCESSINGPATH)
