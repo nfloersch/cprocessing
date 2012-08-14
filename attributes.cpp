@@ -5,7 +5,11 @@
  *      Author: claudio
  */
 
-#include <GL/glut.h>
+#ifdef __APPLE__
+#  include <GLUT/glut.h>
+#else
+#  include <GL/gl.h>
+#endif
 #include <iostream>
 #include "cprocessing.hpp"
 
@@ -235,5 +239,16 @@ namespace cprocessing {
         glDisable(GL_POINT_SMOOTH);
         glDisable(GL_POLYGON_SMOOTH);
     }
+    
+    /// Saves the current styles on a stack
+    void pushStyle() {
+        glPushAttrib (GL_ALL_ATTRIB_BITS);
+    }
+    
+    /// Restore styles saved on a stack
+    void popStyle() {
+        glPopAttrib();
+    }
+        
 
 }

@@ -6,8 +6,11 @@
  *
  *  Contains functions which deal with affine transformations
  */
-
-#include <GL/glut.h>
+#ifdef __APPLE__
+#  include <GLUT/glut.h>
+#else
+#  include <GL/glut.h>
+#endif
 #include <cmath>
 #include "cprocessing.hpp"
 
@@ -42,6 +45,15 @@ namespace cprocessing {
 	void applyMatrix (double matrix [16]) {
 		glMultMatrixd (matrix);
 	}
+
+    /// Applies the given matrix to the current transformation matrix
+    void applyMatrix (const PMatrix& m) {
+        PMatrix tmp (m);
+        tmp.transpose();
+        double matrix [16];
+        tmp.get(matrix);
+        glMultMatrixd (matrix);
+    }
 
 	/// Duplicates the top of the matrix stack
 	void pushMatrix() {
@@ -139,5 +151,24 @@ namespace cprocessing {
 	    gluProject (ox,oy,oz,
 	                mviewmatrix,projmatrix,viewport,
 	                &sx, &sy, &sz);
-	};
+	    // OPENGL screen coordinates run up
+	    sy = height - sy;
+	}
+	
+	/// Returns in ox,oy,oz the object coordinates of screen point (ox, oy, oz),
+    /// i.e., its "unprojection"
+    void objectXYZ (double sx, double sy, double sz,
+                    double& ox, double& oy, double& oz) {
+         // variables for calling gluUnProject
+	    int viewport[4];
+	    double projmatrix [16], mviewmatrix [16];
+	    // get current transformation state
+	    glGetIntegerv(GL_VIEWPORT, viewport);
+	    glGetDoublev(GL_MODELVIEW_MATRIX, mviewmatrix);
+	    glGetDoublev(GL_PROJECTION_MATRIX, projmatrix);
+	    // call gluUnProject, but use y coordinate running down
+	    gluUnProject (sx,height - sy,sz,
+	                  mviewmatrix,projmatrix,viewport,
+	                  &ox, &oy, &oz);
+    }
 }

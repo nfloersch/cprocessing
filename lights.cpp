@@ -5,8 +5,12 @@
  *      Author: claudio
  */
 
+#ifdef __APPLE__
+#  include <GLUT/glut.h>
+#else
+#  include <GL/gl.h>
+#endif
 #include "cprocessing.hpp"
-#include <GL/glut.h>
 #include <iostream>
 
 static bool lights = false; ///< Whether lighting is turned on or off
@@ -27,6 +31,11 @@ static void lightsOn()
     ::lights = true;
     for (int i = 0; i < ::lightCount; i++) glDisable(GL_LIGHT0+i);
     ::lightCount = 0;
+
+    // Make it possible to set material properties by using glcolor
+	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+    glColorMaterial(GL_FRONT_AND_BACK, GL_SPECULAR);
+	glEnable(GL_COLOR_MATERIAL);
 }
 
 namespace cprocessing {

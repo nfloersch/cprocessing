@@ -7,7 +7,11 @@
  *  Functions for drawing basic primitives
  */
 
-#include <GL/glut.h>
+#ifdef __APPLE__
+#  include <GLUT/glut.h>
+#else
+#  include <GL/gl.h>
+#endif
 #include <vector>
 #include <cassert>
 #include <iostream>
@@ -294,6 +298,9 @@ namespace cprocessing {
 		if (fillColor.rgba[3] > 0) {
 			// See if filled sphere is required		
 			glColor4ubv (fillColor.rgba);
+			glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+		    glColorMaterial(GL_FRONT_AND_BACK, GL_SPECULAR);
+			glEnable(GL_COLOR_MATERIAL);
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			glEnable(GL_POLYGON_OFFSET_FILL);
 			glDrawElements(GL_QUAD_STRIP, ures*(vres-1)*2, GL_UNSIGNED_INT, &(sphereIdx[0]));

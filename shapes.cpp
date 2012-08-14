@@ -6,11 +6,15 @@
  */
 
 
-#include <GL/glut.h>
+#ifdef __APPLE__
+#  include <GLUT/glut.h>
+#else
+#  include <GL/glut.h>
+#endif
 #include <vector>
 #include <cassert>
 #include "cprocessing.hpp"
-
+#include <iostream>
 using namespace cprocessing;
 
 ///
@@ -102,6 +106,10 @@ namespace cprocessing {
 			// See if filled shape is required
 			glColor4ubv (fillColor.rgba);
 
+			glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+		    glColorMaterial(GL_FRONT_AND_BACK, GL_SPECULAR);
+			glEnable(GL_COLOR_MATERIAL);
+
 			if (::mode == POLYGON) {
 				// Render as a simple polygon with the help of GLU's tesselation
 				// facilities
@@ -151,6 +159,11 @@ namespace cprocessing {
 		if (strokeColor.rgba[3] > 0) {
 			// See if outline is required
 			glColor4ubv (strokeColor.rgba);
+			glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+		    glColorMaterial(GL_FRONT_AND_BACK, GL_SPECULAR);
+			glEnable(GL_COLOR_MATERIAL);
+			glEnable(GL_POLYGON_OFFSET_LINE);
+			glPolygonOffset(-1,-1);
 			if (::mode == POLYGON) {
 				// activate and specify pointer to vertex array
 				glEnableClientState(GL_VERTEX_ARRAY);
@@ -171,6 +184,7 @@ namespace cprocessing {
 				glDisableClientState (GL_VERTEX_ARRAY);
 				glDisableClientState (GL_NORMAL_ARRAY);
 			}
+			glDisable(GL_POLYGON_OFFSET_LINE);
 		}
 	}
 

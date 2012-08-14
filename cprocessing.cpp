@@ -1,11 +1,15 @@
 /*
- * graphics.cpp
+ * cprocessing.cpp
  *
  *  Created on: Apr 28, 2011
  *      Author: esperanc
  */
 
-#include <GL/glut.h>
+#ifdef __APPLE__
+#  include <GLUT/glut.h>
+#else
+#  include <GL/glut.h>
+#endif
 #include <iostream>
 #include <cassert>
 #include "cprocessing.hpp"
@@ -22,7 +26,6 @@ extern void keyReleased();
 
 using namespace cprocessing;
 
-bool mouseRecordFlag = true; // When to record or not the mouse position
 /// Variables and functions to maintain a backup buffer
 char * backbuffer = 0;
 
@@ -42,7 +45,7 @@ static void writebuffer() {
 	if (backbuffer) {
 		glPushMatrix();
 		glLoadIdentity();
-		glRasterPos3f(0,0,0);
+		glRasterPos3f(-1,1,0);
 		glDrawPixels (width, height, GL_RGBA, GL_UNSIGNED_BYTE , (void*) backbuffer);
 		glPopMatrix();
 	}
@@ -121,7 +124,6 @@ namespace cprocessing {
 
         // Call external display function
         ::draw();
-        mouseRecordFlag = true;
 
 		// Refresh backing buffer if needed
 		if (config&BACK_BUFFER) readbuffer();
@@ -162,44 +164,38 @@ namespace cprocessing {
 
     /// Called whenever mouse moves
     static void mousemotion (int x, int y) {
-      if (mouseRecordFlag){
-         pmouseX = mouseX;
-         pmouseY = mouseY;
-         mouseX = x;
-         mouseY = y;
-         mouseRecordFlag = false;
-      }
-      ::mouseMoved();
-    	if (mousePressed) {
-    		::mouseDragged();
-    	}
+        pmouseX = mouseX;
+        pmouseY = mouseY;
+        mouseX = x;
+        mouseY = y;
+        ::mouseMoved();
+        if (mousePressed) {
+            ::mouseDragged();
+        }
     }
 
     /// Called whenever mouse button is pressed
     static void mouse (int button, int state, int x, int y) {
-       if (mouseRecordFlag){
-         pmouseX = mouseX;
-         pmouseY = mouseY;
-         mouseX = x;
-         mouseY = y;
-         mouseRecordFlag = false;
-       }
+        pmouseX = mouseX;
+        pmouseY = mouseY;
+        mouseX = x;
+        mouseY = y;
 
-       mousePressed = state == GLUT_DOWN;
-  
-       if (button == GLUT_LEFT_BUTTON) {
+        mousePressed = state == GLUT_DOWN;
+
+        if (button == GLUT_LEFT_BUTTON) {
           mouseButton = LEFT;
-       } else if (button == GLUT_RIGHT_BUTTON) {
+        } else if (button == GLUT_RIGHT_BUTTON) {
           mouseButton = RIGHT;
-       } else {
+        } else {
           mouseButton = CENTER;
-       }
-       if (mousePressed) {
+        }
+        if (mousePressed) {
           ::mousePressed();
-       }
-       else {
+        }
+        else {
           ::mouseReleased();
-       }
+        }
     }
 
     /// Called whenever a key is pressed
@@ -280,6 +276,12 @@ namespace cprocessing {
 		if (config&BACK_BUFFER) readbuffer();
     }
 
+
+    // Force redrawing
+    void redraw() {
+        glutPostRedisplay ();
+    }
+
     /// Sets up a window of the given size
     /// @param wid Desired window width in pixels.
     /// @param hgt Desired window height in pixels.
@@ -312,7 +314,7 @@ namespace cprocessing {
 		int argc = 0;
 		char **argv = 0;
 		glutInit(&argc, argv);
-		glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+		glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_MULTISAMPLE);
     	glutTimerFunc (1000/frameRate, refresh, 0);
     	bezierDetail(50);
     	ellipseDetail(50);

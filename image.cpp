@@ -7,7 +7,11 @@
  *  Image support
  */
 
-#include <GL/glut.h>
+#ifdef __APPLE__
+#  include <GLUT/glut.h>
+#else
+#  include <GL/gl.h>
+#endif
 #include <cassert>
 #include <iostream>
 #include "cprocessing.hpp"
