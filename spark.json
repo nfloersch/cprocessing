@@ -1,0 +1,7 @@
+{
+  "name": "cprocessing",
+  "author": "cprocessing project",
+  "license": "MIT",
+  "version": "0.0.10",
+  "description": "C wrapper for processing API"
+}
